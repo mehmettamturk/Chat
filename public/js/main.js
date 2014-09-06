@@ -85,26 +85,39 @@ $(function() {
     }
 
     function addChatMessage (data, options) {
-        var $typingMessages = getTypingMessages(data);
+        var $typingMessages = $('.typing.message.' + data.username);
         options = options || {};
         if ($typingMessages.length !== 0) {
             options.fade = false;
             $typingMessages.remove();
         }
 
-        var $usernameDiv = $('<span class="username"/>')
-            .text(data.username)
-            .css('color', getUsernameColor(data.username));
-        var $messageBodyDiv = $('<span class="messageBody">')
-            .text(data.message);
-
         var typingClass = data.typing ? 'typing' : '';
-        var $messageDiv = $('<li class="message"/>')
-            .data('username', data.username)
-            .addClass(typingClass)
-            .append($usernameDiv, $messageBodyDiv);
 
+        var time = setDate(data.time);
+        var timeMarkup = time ? '<span class="time">' + time + '</span>' : '';
+
+        var messageMarkup = '<li class="message ' + data.username + ' ' + typingClass + '">' +
+                                '<span class="username" style="color: '+ getUsernameColor(data.username) +'"> ' + data.username + ' </span>' +
+                                '<span class="messageBody">' + data.message + '</span>' +
+                                timeMarkup +
+                            '</li>';
+
+        var $messageDiv = $(messageMarkup);
         addMessageElement($messageDiv, options);
+    }
+
+    function setDate(time) {
+        if (!time) return;
+        var date = new Date(time);
+        var todaysDate = new Date();
+
+        var isToday = date.getUTCFullYear() == todaysDate.getUTCFullYear() &&
+                      date.getUTCMonth() == todaysDate.getUTCMonth() &&
+                      date.getUTCDate() == todaysDate.getUTCDate();
+
+        var format = isToday ? "HH:MM" : "default";
+        return date.format(format);
     }
 
     function addChatTyping (data) {
@@ -114,7 +127,7 @@ $(function() {
     }
 
     function removeChatTyping (data) {
-        getTypingMessages(data).fadeOut(function () {
+        $('.typing.message.' + data.username).fadeOut(function () {
             $(this).remove();
         });
     }
@@ -163,12 +176,6 @@ $(function() {
                 }
             }, TYPING_TIMER_LENGTH);
         }
-    }
-
-    function getTypingMessages (data) {
-        return $('.typing.message').filter(function (i) {
-            return $(this).data('username') === data.username;
-        });
     }
 
     function getUsernameColor (username) {

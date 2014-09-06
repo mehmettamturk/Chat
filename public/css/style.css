@@ -133,6 +133,15 @@ ul {
   text-align: right;
 }
 
+.time {
+    float: right;
+    font-weight: 300;
+    padding-right: 15px;
+    text-align: right;
+    font-size: 15px;
+    color: cadetblue;
+}
+
 /* Input */
 
 .inputMessage {
