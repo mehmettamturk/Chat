@@ -242,7 +242,7 @@ $(function() {
 
     socket.on('new message', function (data) {
         addChatMessage(data);
-        playAudio('newMessage.mp3');
+        playAudio('audio/newMessage.mp3');
         setTitle('New Message from ' + data.username);
 
         var flag = true;
@@ -252,7 +252,7 @@ $(function() {
                 setTitle('Chat');
                 flag = false;
             } else {
-                setTitle('New Message from ' + data.username)
+                setTitle('Yeni mesaj');
                 flag = true;
             }
         }, 1000);
@@ -262,7 +262,7 @@ $(function() {
         log(data.username + ' konuşmaya katıldı.');
         addParticipantsMessage(data);
         addUserToList(data.username);
-        //playAudio('newUser.mp3');
+        //playAudio('audio/newUser.mp3');
     });
 
     socket.on('user left', function (data) {
