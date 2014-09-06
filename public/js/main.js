@@ -203,12 +203,12 @@ $(function() {
         }, true);
     }
 
-    // Keyboard events
-    $window.click(function(e) {
+    $window.on("focus", function(e) {
         document.title = 'Chat';
         clearInterval(interval);
     });
 
+    // Keyboard events
     $window.keydown(function (event) {
         if (!(event.ctrlKey || event.metaKey || event.altKey))
             $currentInput.focus();
@@ -250,7 +250,7 @@ $(function() {
     socket.on('new message', function (data) {
         addChatMessage(data);
         playAudio('audio/newMessage.mp3');
-        setTitle('New Message from ' + data.username);
+        setTitle('Yeni Mesaj: ' + data.username);
 
         var flag = true;
         clearInterval(interval);
