@@ -40,13 +40,13 @@ $(function() {
     function updateUserList (data) {
         var markup = '';
         for (var name in data.usernames) {
-            markup += '<p class="'+ name +'"><span></span>'+ name +' çevrimiçi.</p> '
+            markup += '<p class="'+ name +'"><span></span>'+ name +'</p> '
         }
         $('.userList').html(markup);
     }
 
     function addUserToList (username) {
-        $('.userList').append('<p class="'+ username +'"><span></span>'+ username +' çevrimiçi.</p> ');
+        $('.userList').append('<p class="'+ username +'"><span></span>'+ username +'</p> ');
     }
 
     function removeUserFromList (username) {
@@ -96,6 +96,9 @@ $(function() {
 
         var time = setDate(data.time);
         var timeMarkup = time ? '<span class="time">' + time + '</span>' : '';
+
+        var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        data.message = data.message.replace(exp, "<a target='_blank' href='$1'>$1</a>");
 
         var messageMarkup = '<li class="message ' + data.username + ' ' + typingClass + '">' +
                                 '<span class="username" style="color: '+ getUsernameColor(data.username) +'"> ' + data.username + ' </span>' +
