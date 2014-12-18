@@ -1,3 +1,7 @@
+var alphabet = "abcdefghijklmnopqrstuvwxyz";
+var abc = "abcdefghijklmnopqrstuvwxyz";
+var ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 $(function() {
     var FADE_TIME = 150; // ms
     var TYPING_TIMER_LENGTH = 400; // ms
@@ -62,7 +66,11 @@ $(function() {
             $chatPage.show();
             $loginPage.off('click');
             $currentInput = $inputMessage.focus();
-            socket.emit('add user', username);
+
+            socket.emit('add user', {
+                username: username
+                //crypto: $('input[name=crypto]:checked').val()
+            });
         }
     }
 
@@ -71,10 +79,14 @@ $(function() {
         message = cleanInput(message);
         if (message && connected) {
             $inputMessage.val('');
+            var key = prompt('Sifre gir:');
+            message = DoPlayfair(message, ABC, key, 'E', 'Q');
+
             addChatMessage({
                 username: username,
                 message: message
             });
+
             socket.emit('new message', message);
         }
     }
@@ -156,6 +168,20 @@ $(function() {
             $messages.append($el);
 
         $messages[0].scrollTop = $messages[0].scrollHeight;
+
+        //$el.click(function(e) {
+        //    var message = $(this).find('.messageBody').html();
+        //    var key = prompt('Şifreyi Girin:');
+        //
+        //    alert($('input[name=crypto]:checked').val());
+        //    var val = $('input[name=crypto]:checked').val();
+        //    if (val == 'Ceaser')
+        //        message = caeserDecrypt(message, alphabet, key);
+        //    else if (val == 'Playfair')
+        //        message = DoPlayfair(message, ABC, key, 'D', 'Q');
+        //
+        //    alert(message);
+        //});
     }
 
     function cleanInput (input) {
@@ -251,6 +277,8 @@ $(function() {
     });
 
     socket.on('new message', function (data) {
+        var key = prompt('Cozmek icin sifre gir:');
+        data.message = DoPlayfair(data.message, ABC, key, 'D', 'Q');
         addChatMessage(data);
         playAudio('audio/newMessage.mp3');
         setTitle('Yeni Mesaj: ' + data.username);
@@ -290,3 +318,136 @@ $(function() {
         removeChatTyping(data);
     });
 });
+
+
+var toChars = function (str) {
+    return str.split('')
+};
+
+var fromChars = function (str) {
+    return str.join('')
+};
+
+var shiftChar = function (char, alphabet, shift) {
+
+    var mod = function (num, modulus) {
+        return ((num % modulus) + modulus) % modulus;
+    };
+
+    return alphabet.charAt(mod(alphabet.indexOf(char) + shift, alphabet.length))
+};
+
+var caeserEncrypt = function (str, alphabet, shift) {
+    return fromChars(
+        toChars(str).
+            map(function (char) {
+                return shiftChar(char, alphabet, shift)
+            })
+    );
+};
+
+var caeserDecrypt = function (str, alphabet, shift) {
+    return caeserEncrypt(str, alphabet, -shift)
+};
+
+
+var MakeCipherABC = function(abc,key1)  {
+    abc = abc.toUpperCase();
+    key1 = key1.toUpperCase();
+    var cyabc = key1+abc;
+
+    for(var i = 0; i < abc.length; i++) {
+        var letter = cyabc.charAt(i);
+        var pos = cyabc.indexOf(letter,i+1);
+        while(pos > -1) {
+            cyabc = cyabc.substring(0,pos) + cyabc.substring(pos + 1, cyabc.length);
+            pos = cyabc.indexOf(letter, i + 1);
+        }
+    };
+
+    return cyabc;
+};
+
+var DoPlayfair = function(et, key1, abc, dir, dup) {
+    et = et.toUpperCase();
+    key1 = key1.toUpperCase();
+
+    var pos = et.indexOf(" ");
+    while (pos>-1) {
+        et = et.substring(0,pos) + et.substring(pos + 1, et.length);
+        pos = et.indexOf(" ");
+    }
+
+    pos = et.indexOf("?");
+    while(pos>-1) {
+        et = et.substring(0,pos) + et.substring(pos + 1, et.length);
+        pos = et.indexOf("?");
+    }
+
+    var let1, let2;
+    for(var i=0; i < et.length; i = i + 2) {
+        let1 = et.charAt(i);
+        let2 = et.charAt(i+1);
+        if(let1 == let2) {
+            et = et.substring(0, i+1) + "X" + et.substring(i + 1, et.length)
+        }
+    }
+
+    if( (et.length % 2) == 1 ) {
+        et += 'X';
+    }
+
+    if (dup != "") {
+        pos = et.indexOf(dup);
+        while(pos > -1) {
+            et = et.substring(0,pos) + "I" + et.substring(pos + 1, et.length);
+            pos = et.indexOf(dup);
+        }
+    }
+
+    var cyabc = MakeCipherABC(abc, key1);
+    var row = [];
+
+    for (i = 0; i < 5; i++) {
+        row[i] = ""
+    }
+
+    for (i = 0; i < 5; i++) {
+        for(j = 0; j < 5; j++)
+            row[i] += cyabc.charAt(5 * i + j);
+    }
+
+    var shf = 1;
+    if (dir == "E")
+        shf = 1;
+
+    if (dir=="D")
+        shf = 4;
+
+    var dt = "";
+    for(i = 0; i < et.length; i = i + 2) {
+        var pos1 = cyabc.indexOf(et.charAt(i));
+        var pos2 = cyabc.indexOf(et.charAt(i + 1));
+
+        var x1 = pos1 % 5;
+        var y1 = Math.floor(pos1 / 5);
+        var x2 = pos2 % 5;
+        var y2 = Math.floor(pos2 / 5);
+
+        if (y1 == y2) {
+            x1 = (x1 + shf) % 5;
+            x2 = (x2 + shf) % 5
+        } else if (x1 == x2) {
+            y1 = (y1 + shf) % 5;
+            y2 = (y2 + shf) % 5
+        } else {
+            var temp = x1;
+            x1 = x2;
+            x2 = temp
+        }
+
+        dt += row[y1].charAt(x1) + row[y2].charAt(x2) ;
+    };
+
+    return dt;
+};

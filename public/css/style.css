@@ -189,3 +189,7 @@ ul {
     .chatArea { padding-left: 0; }
     .inputMessage { width: 100%; left: 0; }
 }
+
+.radio {
+    color: white;
+}

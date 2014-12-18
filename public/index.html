@@ -5,9 +5,9 @@
     <title> Chat </title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body ng-app="chat">
     <ul class="pages">
-        <li class="chat page">
+        <li class="chat page" ng-controller="ChatController">
             <div class="userList"></div>
             <div class="chatArea">
                 <ul class="messages"></ul>
@@ -16,14 +16,26 @@
         </li>
         <li class="login page">
             <div class="form">
-                <h3 class="title"> Kullanıcı Adınız? </h3>
-                <input class="usernameInput" type="text" maxlength="14" />
+                <input class="usernameInput" type="text" maxlength="14" placeholder="Kullanıcı Adınız?"/>
+                <!--<div class="radio">-->
+                    <!--<label for="ceaser">-->
+                        <!--<input name="crypto" id="ceaser" type="radio" value="Ceaser" class="cipherType"/>-->
+                        <!--Ceaser-->
+                    <!--</label>-->
+                    <!--<label for="playfair">-->
+                        <!--<input name="crypto" id="playfair" type="radio" value="Playfair" class="cipherType"/>-->
+                        <!--Playfair-->
+                    <!--</label>-->
+                <!--</div>-->
             </div>
         </li>
     </ul>
 
+
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="lib/angular.min.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/date.js"></script>
     <script src="js/main.js"></script>
 </body>

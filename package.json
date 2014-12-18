@@ -9,6 +9,12 @@
   "dependencies": {
     "express": "3.4.8",
     "socket.io": "*",
-    "indexof": "*"
+    "indexof": "*",
+    "mongoose": "*",
+    "passport": "*",
+    "passport-local": "*",
+    "passport-local-mongoose": "*",
+    "connect": "*",
+    "session.socket.io": "*"
   }
 }
